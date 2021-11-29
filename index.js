@@ -1,16 +1,15 @@
 import { getFollewers, getFollowing} from "./lib/scraper";
+require('dotenv').config()
 const {MongoClient} = require('mongodb');
     
+const mongoURL = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.p7ext.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const mongoURL = "mongodb+srv://hakanyalcin:111749Abc@cluster0.p7ext.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-
-
-
 async function addUser(client){
-    const db = client.db("instagramdb");
+    const db = client.db(`${process.env.USERNAME}DB`);
     const followersData = await getFollewers();
     for (const user of followersData) {
         const followersElement = await db.collection("followers").insertOne(user);
@@ -18,7 +17,7 @@ async function addUser(client){
     console.log("followers writing on db: OK");
 
     ///////////////////////////////////// 
-    await sleep(Math.random()*20000);
+    await sleep(Math.random()*200);
 
     const followingData = await getFollowing();
     for (const user of followingData) {
@@ -31,7 +30,7 @@ async function addUser(client){
 }
 
 async function compareCollection(client){
-    const db = client.db("testdb");
+    const db = client.db(`${process.env.USERNAME}DB`);
 
     var followersArr =  await db.collection('followers').find({}, {username: 1 }).toArray();;
     var followingArr =  await db.collection('following').find({}, {username: 1 }).toArray();
@@ -53,9 +52,8 @@ async function compareCollection(client){
         useNewUrlParser: true, 
         useUnifiedTopology: true,
     }); 
-
-    compareCollection(client);
-    //addUser(client);
+    await addUser(client);
+    await compareCollection(client);
     console.log("tasks are finished...");
   }
   
