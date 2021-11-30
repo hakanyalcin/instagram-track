@@ -17,7 +17,7 @@ async function addUser(client){
     console.log("followers writing on db: OK");
 
     ///////////////////////////////////// 
-    await sleep(Math.random()*200);
+    await sleep(Math.random()*2000);
 
     const followingData = await getFollowing();
     for (const user of followingData) {
